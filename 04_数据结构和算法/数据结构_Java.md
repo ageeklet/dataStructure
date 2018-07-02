@@ -600,8 +600,427 @@ public class SelectSortApp {
 ### （3）插入排序
 
 > 虽然插入排序算法仍需要O(N^2)的时间，但是在一般情况下，他要比冒泡排序快一倍，比选择排序还要快一点。尽管他比冒泡排序和选择排序算法更麻烦一点，但是他并不复杂。
+>
+> 设有一组关键字｛K1， K2，…， Kn｝；排序开始就认为 K1 是一个有序序列；让 K2 插入上述表长为 1 的有序序列，使之成为一个表长为 2 的有序序列；然后让 K3 插入上述表长为 2 的有序序列，使之成为一个表长为 3 的有序序列；依次类推，最后让 Kn 插入上述表长为 n-1 的有序序列，得一个表长为 n 的有序序列。
+>
+> 算法描述：
+>
+> ​	1、从第一个元素开始，该元素可以认为已经被排序
+>
+> ​	2、取出下一个元素，在已经排序的元素序列中从后向前扫描	
+>
+> ​	3、如果该元素（已排序）大于新元素，将该元素移到下一位置
+>
+> ​	4、重复步骤 3，直到找到已排序的元素小于或者等于新元素的位置
+>
+> ​	5、将新元素插入到该位置后
+>
+> ​	6、重复步骤 2~5
 
+insertionSort.java
 
+```java
+package com.ageeklet.dataStructure.insertionSort;
 
+public class InsertionSort {
+	public static void insertionSort_1(int[] arr) {
+		for(int i=1;i<arr.length;i++){
+			int key = arr[i];  //key为当前索引对应的数组中的值
+			int j = i-1;	   //j为当前索引的前一位
+			while(j>=0 && arr[j]>key) {  //判断索引i对应的数组中的值是否小于前一位
+				arr[j+1] = arr[j];  //   交换前后两个索引对应的数组中的值
+				j--;
+			}
+			arr[j+1] = key;
+		}
+	}
+	
+	public  static void insertionSort_2(int[] arr) {
+		for (int i = 1; i < arr.length; i++) {
+			int temp = arr[i];
+			int j = i-1;
+			 //如果将赋值放到下一行的for循环内, 会导致在第10行出现j未声明的错误
+			for (; j>=0 && arr[j]>temp ; j--) {
+				arr[j+1] = arr[j];
+			}
+			arr[j+1] = temp;
+		}
+	}
+	public static void main(String[] args) {
+		int[] arr = {5, 6, 3, 1, 8, 7, 2, 4};
+		insertionSort_1(arr);
+		for (int i = 0; i < arr.length; i++) {
+			System.out.print(arr[i]+" ");
+		}
+		System.out.println();
+		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		insertionSort_2(arr);
+		for (int i = 0; i < arr.length; i++) {
+			System.out.print(arr[i]+" ");
+		}
+	}
+}
 
+```
+
+> 运行结果：
+
+```java
+1 2 3 4 5 6 7 8 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1 2 3 4 5 6 7 8 
+```
+
+### （4）对象排序
+
+```java
+// TODO
+```
+
+### （5）几种简单排序之间的比较
+
+>  一般情况下几乎不太用冒泡排序算法，过于简单。当数据量很小的时候会用一些应用价值。
+>
+> 选择排序虽然把交换次数降到了最低，但是比较的次数仍然很大。当数据量很小，并且交换数据相对于比较数据更加耗时的情况下，可以应用选择排序。
+>
+> 在大多数的情况下，假设数据量比较小或者基本上有序时，插入排序算法时三种简单排序算法中最好的选择。对于更大的数据量的排序来说，快速排序通常是最快的方法。		
+
+## 3、栈和队列
+
+### （1）栈
+
+> **栈**（英语：stack）又称为**栈**或**堆叠**，是计算机科学中一种特殊的串列形式的抽象数据类型，其特殊之处在于只能允许在链表或数组的一端（称为堆栈顶端指针，英语：top）进行加入数据（英语：push）和输出数据（英语：pop）的运算。另外栈也可以用一维数组链表的形式来完成。堆栈的另外一个相对的操作方式称为队列。
+>
+> 由于堆栈数据结构只允许在一端进行操作，因而按照后进先出（LIFO, Last In First Out）的原理运作
+
+> a、栈实例 1 ：单词逆序
+
+> * StackX.java
+
+```java
+package com.ageeklet.dataStructure.stack;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ * 栈实例1：单词逆序
+ * @author ageeklet
+ */
+public class StackX {
+	private int maxSize;
+	private char[] stackArray;
+	private int top;
+	
+	public StackX(int maxSize) {
+		this.maxSize = maxSize;
+		stackArray = new char[maxSize];
+		top = -1;
+	}
+	
+	/*
+	 * top的值+1，使他指向原顶端数据项上面的一个位置，并在这个位置存储一个数据项。
+	 * top是在插入数据项之前递增的
+	 */
+	public void push(char j) {
+		stackArray[++top] = j;
+	}
+	
+	/*
+	 * 返回top标识的数据项值，然后top-1，该方法有效的移出了数据项
+	 * 虽然数据项仍然存在数组中（直到有新的数据项压入栈中覆盖这个数据项），但不能再访问他了
+	 */
+	public char pop() {
+		return stackArray[top--];
+	}
+	
+	/*
+	 * 返回top所指的数据项的值，不对栈做任何改动
+	 */
+	public char peek() {
+		return stackArray[top];
+	}
+	
+	public boolean isEmpty() {
+		return (top==-1);
+	}
+	
+	public static String getString()throws IOException {
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();//只读取一行数据
+		return s;
+	}
+}
+
+```
+
+> * Reverser.java
+
+```java
+
+	private String input;
+	private String output;
+	
+	public Reverser(String in) {
+		this.input = in;
+	}
+	
+	public String doReverser() {
+		int stackSize = input.length();
+		//创建一个栈
+		StackX theStack = new StackX(stackSize);
+		
+		for (int i = 0; i < input.length(); i++) {
+			//定位输入string中每个字符，并且将其存入到栈中
+			char ch = input.charAt(i);
+			theStack.push(ch);
+		}
+		output = "";
+		while(!theStack.isEmpty()) {
+			//得到栈顶元素，并且将其拼接成一个新的字符串，与原字符串刚好逆序
+			char ch = theStack.pop();
+			output = output + ch;
+		}
+		return output;
+	}
+}
+```
+
+> * ReverserApp.java
+
+```java
+public class ReverserApp {
+
+	public static void main(String[] args) throws IOException {
+		String input,output;
+		while(true) {
+			System.out.print("Enter a string:");
+			System.out.flush();;
+			input = getString();
+			if(input.isEmpty()) {
+				break;
+			}
+			Reverser theReverser = new Reverser(input);
+			output = theReverser.doReverser();
+			System.out.println("Reverserd:" + output);
+		}
+	}
+
+	private static String getString()throws IOException {
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader br = new BufferedReader(isr);
+		String s = br.readLine();//只读取一行数据
+		return s;
+	}
+}
+
+```
+
+> * 运行结果
+
+```java
+Enter a string:char
+Reverserd:rahc
+```
+
+> b、栈实例 2 ：分隔符匹配
+>
+> 栈通常用于解析某种类型的文本串。
+>
+> 分隔符匹配程序从字符串中不断读取字符，每次读取一个字符。若发现它是左分隔符，将它压入栈中。当从输入中读到一个右分隔符时，弹出栈顶的左分隔符，并且查看它是否和右分隔符项匹配。如果不匹配，则程序报错。如果栈中没有左分隔符和右分隔符匹配，或者一直存在没有匹配的分隔符，程序也报错。分隔符没有被匹配，表现为把所有的字符读入之后，栈中仍有分隔符。
+
+> * BracketChecker.java
+
+```java
+public class BracketChecker {
+	private String input;
+	
+	public BracketChecker (String in) {
+		this.input = in;
+	}
+	
+	public void check() {
+		int stackSize = input.length();
+		StackX theStack = new StackX(stackSize);
+		
+		for (int i = 0; i < input.length(); i++) {
+			char ch = input.charAt(i);
+			switch (ch) {
+			case '{':
+			case '[':
+			case '(':
+				theStack.push(ch);
+				break;
+				
+			case '}':
+			case ']':
+			case ')':
+				if(!theStack.isEmpty()) {
+					char chx = theStack.pop();
+					if((ch=='}' && chx!='{') || (ch==']' && chx!='[' )|| (ch==')' && chx!='(')) {
+						System.out.println("Error: "+ch+" at "+i);
+					}
+					break;
+				}else {
+					System.out.println("Error: "+ch+" at "+i);
+				}
+				default:
+					break;
+			}
+		}
+		if(!theStack.isEmpty()) {
+			System.out.println("Error:missing right delimiter");
+		}
+	}
+}
+
+```
+
+> *BracketApp.java
+
+```java
+public class BracketApp {
+	public static void main(String[] args) throws IOException {
+		String input;
+		while(true) {
+			System.out.print("Enter string cotaining delimiters:");
+			System.out.flush();
+			input = StackX.getString();
+			if(input.equals("")) {
+				break;
+			}
+			BracketChecker theChecker = new BracketChecker(input);
+			theChecker.check();
+		}
+	}
+}
+
+```
+
+> * 运行结果
+
+```java
+Enter string cotaining delimiters:a{b[c)d}e
+Error: ) at 5
+Enter string cotaining delimiters:
+```
+
+* 栈的效率
+
+  StackX类中的实现的栈，数据项入栈和出栈的时间复杂度都为常熟O(1)。这也就是说，栈操作所耗的时间不依赖于栈中的数据项的个数，因此操作时间很短。栈不需要比较和移动操作。
+
+### （2）队列
+
+> **队列**，又称为**伫列**（queue），是先进先出（FIFO, First-In-First-Out）的线性表。在具体应用中通常链表或者数组来实现。队列只允许在后端（称为*rear*）进行插入操作，在前端（称为*front*）进行删除操作。
+>
+> 队列的操作方式和堆栈类似，唯一的区别在于队列只允许新数据在后端进行添加。
+
+* 
+
+```java
+public class Queue {
+	private int maxSize;
+	private long[] queueArray;
+	private int front;
+	private int rear;
+	private int nItems;
+	
+	public Queue(int s) {
+		this.maxSize = s;
+		queueArray = new long[s];
+		front = 0;
+		rear = -1;
+		nItems = 0;
+	}
+
+	/*
+	 * insert()方法运行的前提是队列不满
+	 * 一般情况下，插入操作是rear（队尾指针）+1后，在队尾指针所指的位置插入新的数据。但是，当rear指针指向数组的顶端，
+	 * 既maxSize-1位置的时候，在插入数据项之前，它必须回绕到数组的低端。回绕操作把rear设置为-1，因此当rear+1后，它等于0，
+	 * 是数组低端的下标值。最后，nItems+1；
+	 */
+	public void insert(long j) {
+		if(rear == maxSize - 1) {
+			rear = -1;
+		}
+		queueArray[++rear] = j;
+		nItems ++;
+	}
+	
+	/*
+	 * remove()方法前提是队列不为空
+	 * 移除操作总是由front指针得到队头数据项的值，然后将front+1。但是，如果这样做使front的值超过数组的顶端，
+	 * front就必须绕回到数组下标为0的位置上。作这种检验的同时，现将返回值临时存起来。最后nItems-1。
+	 */
+	public long remove() {
+		long temp = queueArray[front++];
+		if(front == maxSize) {
+			front = 0;
+		}
+		nItems --;
+		return temp;
+	}
+	
+	/*
+	 * 返回front指针所指数据项的值。
+	 */
+	public long peekFront() {
+		return queueArray[front];
+	}
+	
+	public boolean isEmpty() {
+		return (nItems==0);
+	}
+	
+	public boolean isFull() {
+		return (nItems==maxSize);
+	}
+	
+	public int size() {
+		return nItems;
+	}
+}
+```
+
+* QueueApp.java
+
+```java
+public class QueueApp {
+	public static void main(String[] args) {
+		Queue queue = new Queue(5);
+		
+		queue.insert(10);
+		queue.insert(20);
+		queue.insert(30);
+		queue.insert(40);
+		
+		queue.remove();
+		queue.remove();
+		queue.remove();
+		
+		queue.insert(50);
+		queue.insert(60);
+		queue.insert(70);
+		queue.insert(80);
+		
+		while(!queue.isEmpty()) {
+			long n = queue.remove();
+			System.out.print(n);
+			System.out.print(" ");
+		}
+		System.out.println("");
+	}
+}
+
+```
+
+* 运行结果
+
+```java
+40 50 60 70 80 
+```
+
+* 队列的效率：和栈一样，队列中插入数据项和移除数据项的时间复杂度为O(1)。
 
