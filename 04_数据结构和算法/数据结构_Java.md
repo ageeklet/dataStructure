@@ -1024,3 +1024,112 @@ public class QueueApp {
 
 * 队列的效率：和栈一样，队列中插入数据项和移除数据项的时间复杂度为O(1)。
 
+### （3）双端队列
+
+> 双端队列就是一个两端都是结尾的队列。队列的每一端都可以插入数据项和移除数据项。这些方法可以叫做insertLeft()和insertRight()方法（或相反的另一对方法），它的功能就和队列一样了。
+>
+> 如果严格禁止调用insertLeft()和removeLeft()方法（或禁用右端的操作），双端队列功能就和栈一样。禁止调用insertLeft()和removeRight()（或相反的另一对方法），它的功能就和队列一样。
+>
+> 双端队列与栈和队列相比，是一种多用途的数据结构，在容器类中有时会用到双端队列来提供栈和队列的两种功能。
+
+### （4）优先级队列
+
+> 如果我们给每个元素都分配一个数字来标记其优先级，不妨设较小的数字具有较高的优先级，这样我们就可以在一个集合中访问优先级最高的元素并对其进行查找和删除操作了。这样，我们就引入了优先级队列这种。 优先级队列（priority queue） 是0个或多个元素的集合，每个元素都有一个优先权，对优先级队列执行的操作有（1）查找（2）插入一个新元素 （3）删除 一般情况下，查找操作用来搜索优先权最大的元素，删除操作用来删除该元素 。对于优先权相同的元素，可按先进先出次序处理或按任意优先权进行。
+
+* PriorityQueue.java
+
+```java
+public class PriorityQueue {
+	private int maxSize;
+	private long[] queueArray;
+	private int nItems;
+	
+	public PriorityQueue(int s) {
+		this.maxSize = s;
+		queueArray = new long[s];
+		nItems = 0;
+	}
+	
+	/*
+	 * insert方法先检查队列中是否有数据项；如果没有，就插入到下标为0的单元里。
+	 * 否则，从数组顶部开始上移存在的数据项，直到找到新数据项应当插入的位置。
+	 * 然后，插入新数据项，并把nItems+1。
+	 * 注意优先级队列可能出现满的情况，应当在用insert()方法之前调用isFull()判断这种可能性。
+	 */
+	public void insert(long item) {
+		int j ;
+		if (nItems == 0) {
+			queueArray[nItems++] = item;
+		}else {
+			for(j=nItems-1;j>=0;j--) {
+				if(item > queueArray[j]) {
+					queueArray[j+1] = queueArray[j];
+				}else {
+					break;
+				}
+			}
+			queueArray[j+1] = item;
+			nItems ++;
+		}
+	}
+	
+	public long remove() {
+		return queueArray[--nItems];
+	}
+	
+	public long peekMin() {
+		return queueArray[nItems-1];
+	}
+	
+	public boolean isEmpty() {
+		return (nItems==0);
+	}
+	
+	public boolean isFull() {
+		return (nItems == maxSize);
+	}
+}
+```
+
+* PriorityApp.java
+
+```java
+public class PriorityApp {
+	public static void main(String[] args) {
+		PriorityQueue pq = new PriorityQueue(5);
+		pq.insert(30);
+		pq.insert(50);
+		pq.insert(10);
+		pq.insert(40);
+		pq.insert(20);
+		
+		while(!pq.isEmpty()) {
+			long item = pq.remove();
+			System.out.print(item+" ");
+		}
+		System.out.println("");
+	}
+}
+
+```
+
+* 运行结果（最小的数据项先移除，所以输出如下所示）
+
+```java
+10 20 30 40 50 
+```
+
+* 优先级队列的效率：插入操作需要O(N)的时间，删除操作需要O(1)。
+
+## 4、链表
+
+### （1）链结点（Link）
+
+> 在链表中，每个数据项都包含在“链结点”（Link）中。一个链结点是某个类的对象，这个类可以叫做Link。因为一个链表中有许多类似的链结点，所以有必要用一个不同于链表的类来表达链结点。每个Link对象中都包含一个对下一个链结点引用的字段（通常叫做next）。但是链表本身的对象中有一个字段指向对第一个链结点的引用。
+
+
+
+
+
+
+
