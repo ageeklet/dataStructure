@@ -1127,6 +1127,310 @@ public class PriorityApp {
 
 > 在链表中，每个数据项都包含在“链结点”（Link）中。一个链结点是某个类的对象，这个类可以叫做Link。因为一个链表中有许多类似的链结点，所以有必要用一个不同于链表的类来表达链结点。每个Link对象中都包含一个对下一个链结点引用的字段（通常叫做next）。但是链表本身的对象中有一个字段指向对第一个链结点的引用。
 
+### （2）单链表
+
+* Link.java
+
+```java
+public class Link {
+	public int iData;
+	public double dData;
+	public Link next;//自引用 包含了一个和自己类型相同的字段
+	
+	public Link(int id,double dd) {
+		this.iData = id;
+		this.dData = dd;
+	}
+	
+	public void displayLink() {
+		System.out.print("{"+iData+","+dData+"}");
+	}
+}
+```
+
+* LinkList.java
+
+```java
+public class LinkList {
+
+	//链表中第一个链结点的引用，是唯一的链表需要维护的永久信息,用以定位其他所有的链结点
+	private Link first;
+	
+	public void LinkList() {
+		this.first = null;
+	}
+	
+	public boolean isEmpty() {
+		return 	(first==null);
+	}
+	
+	/*
+	 * 在表头插入一个新链结点。以为first已经指向了第一个链结点，为了插入新的链结点，
+	 * 只需要使新创建的链结点的next字段等于原来的first值，然后改变first的值，使它
+	 * 指向新创建的链结点
+	 */
+	public void insertFirst(int id,double dd) {
+		Link newLink = new Link(id, dd);
+		newLink.next = first;
+		first = newLink;
+	}
+	
+	/*
+	 * current开始时指向first，然后通过不断的把自己赋值为current.next,沿着链表向前移动
+	 * 在每个链结点处，find()检查链结点的关键值是否与他寻找的相等。如果找到了，它返回对该
+	 * 链结点的引用。如果find()到达链表尾端，但没有发现要找的链结点，则返回null
+	 */
+	public Link find(int key) {
+		Link current = first;
+		while(current.iData!=key) {
+			if(current.next==null) {
+				return null;
+			}else {
+				current = current.next;
+			}
+		}
+		return current;
+	}
+	
+	/*
+	 * 先搜索要删除的链结点。然而它需要掌握的不仅是指向当前的链结点（current）的引用，
+	 * 还有指向当前链结点的前一个（previous）链结点的引用。
+	 * 如果要删除当前的链结点，必须把前一个链结点和后一个链结点连在一起
+	 */
+	public Link delete(int key) {
+		Link current = first;
+		Link previous = first;
+		while(current.iData!=key) {
+			if(current.next==null) {
+				return null;
+			}else {
+				previous = current;
+				current = current.next;
+			}
+		}
+		if(current == first) {
+			first = first.next;
+		}else {
+			previous.next = current.next;
+		}
+		return current;
+	}
+	/*
+	 * 通过把first重新指向第二个链结点，断开了和第一个链结点的连接
+	 * first = first.next; 是从链表中删除一个链结点。最后需要返回一个链结点，为了链表的使用者的方便，
+	 * 我们在删除它之前把它存储在temp变量中，并且返回temp值
+	 */
+	public Link deleteFirst() {
+		Link temp = first;
+		first = first.next;
+		return temp;
+	}
+	
+	/*
+	 * 为了显示链表，从first开始，沿着引用链从一个链结点到下一个链结点，变量current按顺序指向（引用）每一个链结点。
+	 */
+	public void displayList() {
+		System.out.print("List (first-->last):");
+		Link current = first;
+		while(current !=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println(" ");
+	}
+}
+```
+
+* LinkListApp.java
+
+```java
+public class LinkListApp {
+	public static void main(String[] args) {
+		LinkList theList = new LinkList();
+		theList.insertFirst(22, 2.99);
+		theList.insertFirst(44, 4.99);
+		theList.insertFirst(66, 6.99);
+		theList.insertFirst(88, 8.99);
+		
+		theList.displayList();
+		
+		/*while(!theList.isEmpty()) {
+			Link aLink = theList.deleteFirst();
+			System.out.print("Deleted");
+			aLink.displayLink();
+			System.out.println(" ");
+		}*/
+		
+		Link f = theList.find(44);
+		if(f!=null) {
+			System.out.println("Found link with key"+f.iData);
+		}else {
+			System.out.println("Can not find link");
+		}
+		
+		Link d = theList.delete(66);
+		if(d!=null) {
+			System.out.println("Deleted link with key:"+d.iData);
+		}else {
+			System.out.println("Can not delete link");
+		}
+		
+		theList.displayList();
+	}
+}
+```
+
+* 运行结果
+
+```java
+List (first-->last):{88,8.99}{66,6.99}{44,4.99}{22,2.99} 
+Deleted{88,8.99} 
+Deleted{66,6.99} 
+Deleted{44,4.99} 
+Deleted{22,2.99} 
+List (first-->last): 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+List (first-->last):{88,8.99}{66,6.99}{44,4.99}{22,2.99} 
+Found link with key44
+Deleted link with key:66
+List (first-->last):{88,8.99}{44,4.99}{22,2.99} 
+```
+
+### （3）双端链表
+
+> 双端链表与传统的链表非常相似，但是他有一个新增的特性：既对最后一个链结点的引用，就像对第一个链结点的引用一样。
+>
+> 对最后一个链结点的引用允许像在表头一样，在表尾直接差一个链结点。当然，仍然可以在普通的单链表的表尾插入一个链结点，方法是遍历整个链表知道到达表尾，但是这种方法效率很低。
+>
+> 像访问表头一样访问表尾的特性，使双端链表更适合于一些普通链表的不方便操作的场合，队列的实现就是这样一个情况。
+
+* Link.java
+
+```java
+public class Link {
+	public long dData;
+	public Link next;
+	
+	public Link(long d) {
+		this.dData = d;
+	}
+	
+	public void displayLink() {
+		System.out.print(dData+" ");
+	}
+
+```
+
+* FirstLastList.java
+
+```java
+public class FirsrLastList {
+	private Link first;
+	private Link last;
+	
+	public FirsrLastList() {
+		first = null;
+		last = null;
+	}
+	
+	public boolean isEmpty() {
+		return first==null;
+	}
+
+	/*
+	 * 在表头重复插入会颠倒链结点进入的顺序
+	 */
+	public void insertFirst(long d) {
+		Link newLink = new Link(d);
+		/*
+		 * 若插入前链表是空的，若isEmpty()为真，
+		 * 那么insertFirst()必须把last指向新的链结点
+		 */
+		if(isEmpty()) {
+			last = newLink;
+		}
+		newLink.next = first;
+		first = newLink;
+	}
+	
+	/*
+	 * 在表尾重复插入则保持连接点的进入的顺序
+	 * 这个方法在表尾插入一个新的链结点。
+	 * 首先改变last.next,使其指向新生成的链结点，然后改变last，使其指向新的链结点
+	 */
+	public void insertLast(long d) {
+		Link newLink = new Link(d);
+		/*
+		 * 若插入前链表是空的，若isEmpty()为真，
+		 * 那么insertLast()必须把first指向新的链结点
+		 */
+		if(isEmpty()) {//first==null
+			first = newLink;
+		}else {
+			last.next = newLink;
+		}
+		last = newLink;
+	}
+	
+	public long deleteFirst() {
+		long temp = first.dData;
+		if(first.next==null) {
+			last = null;
+		}
+		first = first.next;
+		return temp;
+	}
+	
+	public void displayList() {
+		System.out.println("List(first-->last):");
+		Link current = first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+}
+```
+
+* FirstLastApp.java
+
+```java
+public class FirstLastApp {
+	public static void main(String[] args) {
+		FirsrLastList theList = new FirsrLastList();
+		
+		theList.insertFirst(22);
+		theList.insertFirst(44);
+		theList.insertFirst(66);
+		
+		theList.insertLast(11);
+		theList.insertLast(33);
+		theList.insertLast(55);
+		
+		theList.displayList();
+		
+		theList.deleteFirst();
+		theList.deleteFirst();
+		
+		theList.displayList();
+	}
+}
+```
+
+* 运行结果
+
+```java
+List(first-->last):66 44 22 11 33 55 
+List(first-->last):22 11 33 55
+```
+
+* 链表的效率：在表头插入和删除速度很快。仅需要改变一两个引用值，所以花费O(1)的时间。
+
+
+
+
+
 
 
 
