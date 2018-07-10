@@ -1429,9 +1429,338 @@ List(first-->last):22 11 33 55
 
 ### （4）抽象数据类型
 
+> 抽象数据类型（ADT）：一种考虑数据结构的方式，着重于它做什么，而忽略它是怎么做的。
 
+* Link.java
 
+```java
+public class Link {
+	public long dData;
+	public Link next;
+	
+	public Link(Long dd) {
+		this.dData = dd;
+	}
+	
+	public void displayLink() {
+		System.out.print(dData+" ");
+	}
+}
+```
 
+##### a、用链表实现栈
+
+* LinkList.java
+
+```java
+public class LinkList {
+	private Link first;
+	
+	public LinkList() {
+		this.first = null;
+	}
+	
+	public boolean isEmpty() {
+		return (first == null);
+	}
+	
+	public void insertFirst(long dd) {
+		Link newLink = new Link(dd);
+		newLink.next = first;
+		first = newLink;
+	}
+	
+	public long deleteFirst() {
+		Link temp = first;
+		first = first.next;
+		return temp.dData;
+	}
+	
+	public void displayList() {
+		Link current = first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+}
+```
+
+* LinkStack.java
+
+```java
+public class LinkStack {
+	private LinkList theList;
+	
+	public LinkStack() {
+		theList = new LinkList();
+	}
+	
+	public void push(long j) {
+		theList.insertFirst(j);
+	}
+	
+	public long pop() {
+		return theList.deleteFirst();
+	}
+	
+	public boolean isEmpty() {
+		return (theList.isEmpty());
+	}
+	
+	public void displayStack() {
+		System.out.print("Stack(top-->bottom)");
+		theList.displayList();
+	}
+}
+
+```
+
+* LinkStack.java
+
+```java
+public class LinkStackApp {
+	public static void main(String[] args) {
+		LinkStack theStack = new LinkStack();
+		theStack.push(20);
+		theStack.push(40);
+		
+		theStack.displayStack();
+		
+		theStack.push(60);
+		theStack.push(80);
+		
+		theStack.displayStack();
+		
+		theStack.pop();
+		theStack.pop();
+		
+		theStack.displayStack();
+	}
+}
+```
+
+* 运行结果
+
+```java
+Stack(top-->bottom)40 20 
+Stack(top-->bottom)80 60 40 20 
+Stack(top-->bottom)40 20 
+```
+
+##### b、用链表实现队列
+
+* FirstLastList.java
+
+```java
+public class FirstLastList {
+	private Link first;
+	private Link last;
+	
+	public FirstLastList() {
+		first = null;
+		last = null;
+	}
+	
+	public boolean isEmpty() {
+		return first==null;
+	}
+	
+	public void insertLast(long dd) {
+		Link newLink = new Link(dd);
+		if(isEmpty()) {
+			first = newLink;
+		}else {
+			last.next = newLink;
+		}
+		last = newLink;
+	}
+	
+	public long deleteFitst() {
+		long temp = first.dData;
+		if(first.next==null) {
+			last = null;
+		}
+		first = first.next;
+		return temp;
+	}
+	
+	public void displayList() {
+		Link current = 	first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+}
+```
+
+* LinkQueue.java
+
+```java
+public class LinkQueue {
+	private FirstLastList theList;
+	
+	public LinkQueue() {
+		theList = new FirstLastList();
+	}
+	
+	public boolean isEmpty() {
+		return theList.isEmpty();
+	}
+	
+	public void insert(long j) {
+		theList.insertLast(j);
+	}
+	
+	public long remove() {
+		return theList.deleteFitst();
+	}
+	
+	public void displayQueue() {
+		System.out.print("Queue(front-->rear)");
+		theList.displayList();
+	}
+}
+```
+
+* LinkQueueApp.java
+
+```java
+public class LinkQueueApp {
+	public static void main(String[] args) {
+		LinkQueue theQueue = new LinkQueue();
+		theQueue.insert(20);
+		theQueue.insert(40);
+		
+		theQueue.displayQueue();
+		
+		theQueue.insert(60);
+		theQueue.insert(80);
+		
+		theQueue.displayQueue();
+		
+		theQueue.remove();
+		theQueue.remove();
+
+		theQueue.displayQueue();
+	}
+}
+
+```
+
+* 运行结果
+
+```java
+Queue(front-->rear)20 40 
+Queue(front-->rear)20 40 60 80 
+Queue(front-->rear)60 80 
+```
+
+> ​	LinkStack.java和LinkQueue.java强调栈和队列是概念上的实体，独立与他们的具体实现。用数组或是链表实现栈都是一样的。栈的重要性在于它的push()和pop()操作，以及他们如何使用他们，而不是实现这些操作的内在机制。
+>
+> ​	什么时候应该使用链表而不是队列来实现栈和队列？这一点要取决于是否能精确的预测栈或队列需要容纳的数据量。如果这点不清楚，链表就比数组表现出更好的适应性。两者都很快，所以速度可能不是考虑的重点。
+
+> ​	在面向对象编程中，一个抽象数据类型是一个类，且不考虑它的实现。它是对类中数据（域）的描述和能够在数据上执行一系列的操作（方法）以及如何使用这些操作的说明。每个方法如何执行任务的细节肯定不包括在内。作为类的用户，只会被告知调用那些方法，如何调用他们，以及可望得到的结果，但是不包括内部如何存储的。
+>
+> ​	当“抽象数据类型”用于像栈和队列这样的数据结构时，它的意义被进一步扩展了。和其他类一样，它意味着数据和在数据上执行的操作，即便在这种情况下，如何存储数据结构的基本原则对于类用户来说也是不可见的。用户不仅不知道方法怎样运行，也不知道数据如何存储的。
+
+### （5）有序链表
+
+> ​	在有序链表中，数据是按照关键值有序排列的。有序链表的删除常常只限于删除在链表头部的最小（或者最大）的链结点	。
+>
+> ​	一般，在大多数需要使用有序数组的场合也可以使用有序链表。有序链表优于有序数组的地方是插入的速度（因为元素不需要移动），另外链表可以扩展到全部有效的使用内存，而数组只能局限于	一个固定的大小中。但是，有序链表实现起来比有序数组更困难一些。
+
+##### a、在有序链表中插入一个数据项
+
+* SortedList.java
+
+```java
+public class SortedList {
+	private Link first;
+	
+	public SortedList() {
+		first = null;
+	}
+	
+	public boolean isEmpty() {
+		return (first==null);
+	}
+	
+	public void insert(long key) {
+		Link newLink = new Link(key);
+		Link previous = null;
+		Link current = first;
+		
+		while(current!=null && key>current.dData) {
+			previous = current;
+			current = current.next;
+		}
+		if(previous==null) {
+			first = newLink;
+		}else {
+			previous.next = newLink;
+		}
+		newLink.next = current;
+	}
+	
+	public Link remove() {
+		Link temp = first;
+		first = first.next;
+		return temp;
+	}
+	
+	public void displayList() {
+		System.out.print("List(first-->last):");
+		Link current = first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+}
+```
+
+* SortedListApp.java
+
+```java
+public class SortedListApp {
+	public static void main(String[] args) {
+		SortedList theList = new SortedList();
+		theList.insert(20);
+		theList.insert(40);
+		
+		theList.displayList();
+		
+		theList.insert(10);
+		theList.insert(30);
+		theList.insert(50);
+		
+		theList.displayList();
+		
+		theList.remove();
+		
+		theList.displayList();
+	}
+}
+```
+
+* 运行结果
+
+```java
+List(first-->last):20 40 
+List(first-->last):10 20 30 40 50 
+List(first-->last):20 30 40 50 
+```
+
+* 有序链表的效率：在有序链表插入和删除某一项最多需要O(N)次比较，因为必须沿着链表上一步一步走才能找到正确的位置。然而，可以在O(1)的时间内找到或删除最小值，因为它总在表头。如果一个应用频繁的存取最小项，且不需要快速的插入，那么有序链表是一个有效的方案选择。
+
+##### b、表插入排序
+
+> 在有序链表中没插入一个新的链结点，平均要与一半已存在的数据进行比较，如果插入N个新数据，就进行了N^2/4次比较。每一个链结点只进行两次复制：一次从数组到链表，一次从链表到数组。在数组中插入排序需要N^2次移动，相比之下，2*N次移动更好。
 
 
 
