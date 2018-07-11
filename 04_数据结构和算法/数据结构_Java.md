@@ -1762,7 +1762,290 @@ List(first-->last):20 30 40 50
 
 > 在有序链表中没插入一个新的链结点，平均要与一半已存在的数据进行比较，如果插入N个新数据，就进行了N^2/4次比较。每一个链结点只进行两次复制：一次从数组到链表，一次从链表到数组。在数组中插入排序需要N^2次移动，相比之下，2*N次移动更好。
 
+* SortedList2.java
 
+```java
+public class SortedList2 {
+	private Link first;
+	
+	public SortedList2() {
+		first = null;
+	}
+	
+	public SortedList2(Link[] linkArr ) {
+		first = null;
+		for (int i = 0; i < linkArr.length; i++) {
+			insert(linkArr[i]);
+		}
+	}
+	
+	public boolean isEmpty() {
+		return (first==null);
+	}
+	
+	public void insert(Link k) {
+		Link previous = null;
+		Link current = first;
+		
+		while(current!=null && k.dData>current.dData) {
+			previous = current;
+			current = current.next;
+		}
+		if(previous==null) {
+			first = k;
+		}else {
+			previous.next = k;
+		}
+		k.next = current;
+	}
+	
+	public Link remove() {
+		Link temp = first;
+		first = first.next;
+		return temp;
+	}
+	
+	public void displayList() {
+		System.out.print("List(first-->last):");
+		Link current = first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+}
+```
+
+* SortedListApp.java
+
+```java
+public static void main(String[] args) {
+		int size = 10;
+		Link[] linkArr = new Link[size];
+		for (int i = 0; i < size; i++) {
+			int n = (int)(Math.random()*99);
+			Link newLink = new Link((long) n);
+			linkArr[i] = newLink;
+ 		}
+		System.out.print("Unsorted array:");
+		for (int i = 0; i < linkArr.length; i++) {
+			System.out.print(linkArr[i].dData+" ");
+		}
+		System.out.println(" ");
+		
+		SortedList2 theList = new SortedList2(linkArr);
+		
+		for (int i = 0; i < linkArr.length; i++) {
+			linkArr[i] = theList.remove();
+		}
+		System.out.print("Sorted Array:");
+		for (int i = 0; i < linkArr.length; i++) {
+			System.out.print(linkArr[i].dData+" ");
+		}
+		System.out.println("");
+	}
+```
+
+* 运行结果
+
+```java
+Unsorted array:12 18 46 74 80 74 47 77 23 66  
+Sorted Array:12 18 23 46 47 66 74 74 77 80 
+```
+
+> ​	SotedList2类的新构造方法把Link函数对象的数组作为参数注入，然后把这个数组内容插入到新创建的链表中。
+>
+> ​	和基于数组插入排序相比，表插入排序有一个缺点，就是他要开辟差不多两倍的空间；数组和链表必须同时存在与内存中。但如果现有的有序链表类可用，那么用表插入排序对不太大的数组排序是比较便利的。
+
+### （6）双向链表
+
+> ​	双向链表既允许向前遍历，也允许向遍历整个链表。其中秘密在于每个链表链结点有两个指向其他链结点的引用，而不是一个第一个像普通链表一样指向下一个链结点。第二个指向前一个链结点。
+>
+> ​	双向链表的缺点是每次插入或这删除一个链结点的时候，要处理四个链结点的引用，而不是两个：两个连接前一个链结点，两个连接后一个链结点。当然，由于多了两个引用，连接点的额占用空间也变大了一点。
+
+* Link.java
+
+```java
+public class Link {
+	public long dData;
+	public Link previous;
+	public Link next;
+	
+	public Link(long d) {
+		this.dData = d;
+	}
+	
+	public void displayLink() {
+		System.out.print(dData+" ");
+	}
+}
+```
+
+* DoubleLinkedList.java
+
+```java
+public class DoubleLinkedList {
+	private Link first;
+	private Link last;
+	
+	public boolean isEmpty() {
+		return (first==null);
+	}
+	
+	/*
+	 * 在表头插入数据项
+	 */
+	public void insertFirst(long d) {
+		Link newLink = new Link(d);
+		if(isEmpty()) {
+			last = newLink;
+		}else {
+			first.previous = newLink;
+		}
+		newLink.next = first;
+		first = newLink;
+	}
+	
+	public void insertLast(long d) {
+		Link newLink = new Link(d);
+		if(isEmpty()) {
+			first = newLink;
+		}else {
+			last.next = newLink;
+			newLink.previous = last;
+		}
+		last = newLink;
+	}
+	
+	public Link deleteFirst() {
+		Link temp = first;
+		if(first.next==null) {
+			last = null;
+		}else {
+			first.next.previous = null;
+		}
+		first = first.next;
+		return temp;
+	}
+
+	public Link deleteLast() {
+		Link temp = last;
+		if(first.next==null) {
+			first = null;
+		}else {
+			last.previous.next = null;
+		}
+		last = last.previous;
+		return temp;
+	}
+	
+	public boolean	insertAfter(long key,long dd) {
+		Link current = first;
+		while(current.dData!=key) {
+			current = current.next;
+			if(current==null) {
+				return false;
+			}
+		}
+		Link newLink = new Link(dd);
+		if(current==last) {
+			newLink.next = null;
+			last = newLink;
+		}else {
+			newLink.next = current.next;
+			current.next.previous = newLink;
+		}
+		newLink.previous = current;
+		current.next = newLink;
+		return true;
+	}
+	
+	public Link deleteKey(long key) {
+		Link current = first;
+		while(current.dData != key) {
+			current = current.next;
+			if(current==null) {
+				return null;
+			}
+		}
+		if(current==first) {
+			first = current.next;
+		}else {
+			current.previous.next = current.next;
+		}
+		if(current==last) {
+			last = current.previous;
+		}else {
+			current.next.previous = current.previous;
+		}
+		return current;
+	}
+	
+	public void dispalyForward() {
+		System.out.print("List (first-->last):");
+		Link current = first;
+		while(current!=null) {
+			current.displayLink();
+			current = current.next;
+		}
+		System.out.println("");
+	}
+	
+	public void displayBackword() {
+		System.out.print("List (first-->last):");
+		Link current = last;
+		while(current!=null) {
+			current.displayLink();
+			current = current.previous;
+		}
+		System.out.println("");
+	}
+}
+```
+
+*  DoublyLinkedApp.java
+
+```java
+public class DoublyLinkedApp {
+	public static void main(String[] args) {
+		DoubleLinkedList theList = new DoubleLinkedList();
+		
+		theList.insertFirst(22);
+		theList.insertFirst(44);
+		theList.insertFirst(66);
+		
+		theList.insertLast(11);
+		theList.insertLast(33);
+		theList.insertLast(55);
+		
+		theList.dispalyForward();
+		theList.displayBackword();
+		
+		theList.deleteFirst();
+		theList.deleteLast();
+		theList.deleteKey(11);
+		
+		theList.dispalyForward();
+		
+		theList.insertAfter(22, 77);
+		theList.insertAfter(33, 88);
+		
+		theList.dispalyForward();
+	}
+}
+```
+
+* 运行结果
+
+```java
+List (first-->last):66 44 22 11 33 55 
+List (first-->last):55 33 11 22 44 66 
+List (first-->last):44 22 33 
+List (first-->last):44 22 77 33 88 
+```
+
+### （7）迭代器
 
 
 
